@@ -143,6 +143,11 @@ LRESULT CALLBACK GLWinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		
 		case WM_PAINT:
 			{
+				glClearColor(0.75f, 0, 0, 1);
+				glClear(GL_COLOR_BUFFER_BIT);
+				HDC hdc = GetDC(hwnd);
+				SwapBuffers(hdc);
+				ReleaseDC(hwnd, hdc);
 				break;
 			
 			}
