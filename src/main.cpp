@@ -98,22 +98,52 @@ LRESULT CALLBACK WinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
   switch (msg)
     {
-    case WM_CREATE: break;
+    case WM_CREATE: 
+		{
+			HWND txtVertexShader = CreateWindow(
+			   "EDIT",
+			   "",
+			   ES_LEFT | ES_MULTILINE | WS_VISIBLE | WS_CHILDWINDOW |
+			   WS_VSCROLL | ES_AUTOVSCROLL,
+			   0,
+			   20,
+			   300,
+			   200,
+			   (HWND) hwnd,
+			   (HMENU) NULL,
+			   (HINSTANCE) GetWindowLongPtr(hwnd, GWLP_HINSTANCE),
+			   NULL);
+			   
+			HWND txtFragmentShader = CreateWindow(
+			   "EDIT",
+			   "",
+			   ES_LEFT | ES_MULTILINE | WS_VISIBLE | WS_CHILDWINDOW |
+			   WS_VSCROLL | ES_AUTOVSCROLL,
+			   0,
+			   260,
+			   300,
+			   200,
+			   (HWND) hwnd,
+			   (HMENU) NULL,
+			   (HINSTANCE) GetWindowLongPtr(hwnd, GWLP_HINSTANCE),
+			   NULL);
+			
+		}
+		break;
+	
     case WM_CLOSE: 
 		printf("in WM_CLOSE\n");
 		DestroyWindow(hwnd); break;
     case WM_PAINT:
-      {
-	/*PAINTSTRUCT ps;
-	HDC hdc = BeginPaint(hwnd, &ps);
-	SetTextColor(hdc, 0x00ff0000);
-	TextOut(hdc,
-		10,
-		10,
-		"hello world",
-		11);
-		EndPaint(hwnd, &ps);*/
-      }
+		{
+			HDC hdc = GetDC(hwnd);
+			
+			SetBkMode(hdc, TRANSPARENT);
+			SetTextColor(hdc, RGB(200, 200, 200));
+			TextOut(hdc, 2, 2, "Vertex Shader: ", 14 );
+			TextOut(hdc, 2, 242, "Fragment Shader: ", 20);
+			ReleaseDC(hwnd, hdc);
+		}
       break;
     case WM_DESTROY:
       PostQuitMessage(0);
