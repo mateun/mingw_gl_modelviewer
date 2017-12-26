@@ -139,6 +139,15 @@ void InitGL(HWND hWnd)
 
 }
 
+void CompileShaders(const char* vsCode, const char* fsCode)
+{
+	// TODO: inlcude glext.h etc. 
+	// load the functions dynamically via wglGetProc(...)
+	GLuint shaders[2];
+	glCreateShader(2, shaders);
+	
+}
+
 LRESULT CALLBACK GLWinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch(msg) 
