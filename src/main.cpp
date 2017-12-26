@@ -12,6 +12,8 @@ LRESULT CALLBACK WinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 global_file int S_W = 1024;
 global_file int S_H = 768;
+global_file HWND txtVertexShader;
+global_file HWND txtFragmentShader;
 
 LRESULT CALLBACK GLWinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -132,7 +134,8 @@ void InitGL(HWND hWnd)
 		HGLRC ourOpenGLRenderingContext = wglCreateContext(ourWindowHandleToDeviceContext);
 		wglMakeCurrent (ourWindowHandleToDeviceContext, ourOpenGLRenderingContext);
 
-		MessageBoxA(0,(char*)glGetString(GL_VERSION), "OPENGL VERSION",0);
+		
+		printf("OPENGL VERSION: %s\n", (char*)glGetString(GL_VERSION) );
 
 }
 
@@ -163,7 +166,7 @@ LRESULT CALLBACK WinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
     {
     case WM_CREATE: 
 		{
-			HWND txtVertexShader = CreateWindow(
+			txtVertexShader = CreateWindow(
 			   "EDIT",
 			   "",
 			   ES_LEFT | ES_MULTILINE | WS_VISIBLE | WS_CHILDWINDOW |
@@ -177,7 +180,7 @@ LRESULT CALLBACK WinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			   (HINSTANCE) GetWindowLongPtr(hwnd, GWLP_HINSTANCE),
 			   NULL);
 			   
-			HWND txtFragmentShader = CreateWindow(
+			txtFragmentShader = CreateWindow(
 			   "EDIT",
 			   "",
 			   ES_LEFT | ES_MULTILINE | WS_VISIBLE | WS_CHILDWINDOW |
