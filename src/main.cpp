@@ -13,6 +13,8 @@ LRESULT CALLBACK WinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 global_file int S_W = 1024;
 global_file int S_H = 768;
 
+LRESULT CALLBACK GLWinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
 
 int APIENTRY WinMain(HINSTANCE hinst, HINSTANCE prevInst,
 		     LPSTR cmdLine, int cmdShowParam)
@@ -33,6 +35,13 @@ int APIENTRY WinMain(HINSTANCE hinst, HINSTANCE prevInst,
   wcx.lpszClassName = "MainWClass";
 
 
+  RegisterClass(&wcx);
+  
+  wcx.lpszMenuName = NULL;
+  wcx.lpszClassName = "GL_WIN_CLASS";
+  wcx.hIcon = NULL;
+  wcx.lpfnWndProc = GLWinProc;
+  
   RegisterClass(&wcx);
 
   HWND hWnd = CreateWindow(
@@ -88,11 +97,60 @@ int APIENTRY WinMain(HINSTANCE hinst, HINSTANCE prevInst,
     }
 	
   }
-		
   
   return 0;
 }
 
+void InitGL(HWND hWnd) 
+{
+	PIXELFORMATDESCRIPTOR pfd =
+		{
+			sizeof(PIXELFORMATDESCRIPTOR),
+			1,
+			PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER,    //Flags
+			PFD_TYPE_RGBA,            //The kind of framebuffer. RGBA or palette.
+			32,                        //Colordepth of the framebuffer.
+			0, 0, 0, 0, 0, 0,
+			0,
+			0,
+			0,
+			0, 0, 0, 0,
+			24,                        //Number of bits for the depthbuffer
+			8,                        //Number of bits for the stencilbuffer
+			0,                        //Number of Aux buffers in the framebuffer.
+			PFD_MAIN_PLANE,
+			0,
+			0, 0, 0
+		};
+
+		HDC ourWindowHandleToDeviceContext = GetDC(hWnd);
+
+		int  letWindowsChooseThisPixelFormat;
+		letWindowsChooseThisPixelFormat = ChoosePixelFormat(ourWindowHandleToDeviceContext, &pfd); 
+		SetPixelFormat(ourWindowHandleToDeviceContext,letWindowsChooseThisPixelFormat, &pfd);
+
+		HGLRC ourOpenGLRenderingContext = wglCreateContext(ourWindowHandleToDeviceContext);
+		wglMakeCurrent (ourWindowHandleToDeviceContext, ourOpenGLRenderingContext);
+
+		MessageBoxA(0,(char*)glGetString(GL_VERSION), "OPENGL VERSION",0);
+
+}
+
+LRESULT CALLBACK GLWinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	switch(msg) 
+	{
+		
+		case WM_PAINT:
+			{
+				break;
+			
+			}
+		default: return DefWindowProc(hwnd, msg, wParam, lParam);
+	}
+	
+	return 0;
+}
 
 LRESULT CALLBACK WinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -127,6 +185,21 @@ LRESULT CALLBACK WinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			   (HMENU) NULL,
 			   (HINSTANCE) GetWindowLongPtr(hwnd, GWLP_HINSTANCE),
 			   NULL);
+			   
+			HWND glWin = CreateWindow(
+			   "GL_WIN_CLASS",
+			   "",
+			   WS_VISIBLE | WS_CHILDWINDOW | WS_BORDER,
+			   310,
+			   20,
+			   600,
+			   600,
+			   (HWND) hwnd,
+			   (HMENU) NULL,
+			   (HINSTANCE) GetWindowLongPtr(hwnd, GWLP_HINSTANCE),
+			   NULL);
+			   
+			InitGL(glWin);
 			
 		}
 		break;
