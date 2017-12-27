@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <Windows.h>
 #include <gl/GL.h>
+#define GL_GLEXT_PROTOTYPES
+#include <GL/glext.h>
 #include <resource.h>
 
 #define global_file static
@@ -139,12 +141,28 @@ void InitGL(HWND hWnd)
 
 }
 
-void CompileShaders(const char* vsCode, const char* fsCode)
+void CompileShaders(const GLchar** vsCode, const GLchar** fsCode)
 {
 	// TODO: inlcude glext.h etc. 
 	// load the functions dynamically via wglGetProc(...)
-	GLuint shaders[2];
-	glCreateShader(2, shaders);
+	PFNGLCREATESHADERPROC fnCreateShader = (PFNGLCREATESHADERPROC) wglGetProcAddress("glCreateShader");
+	GLuint vshader = fnCreateShader(GL_VERTEX_SHADER);	
+	GLuint fshader = fnCreateShader(GL_FRAGMENT_SHADER);
+	
+	printf("vshader name: %d\nfshader name: %d\n", vshader, fshader);
+	
+	PFNGLSHADERSOURCEPROC fnShaderSource = (PFNGLSHADERSOURCEPROC) wglGetProcAddress("glShaderSource");
+	fnShaderSource(vshader, 1, vsCode, NULL);
+	PFNGLCOMPILESHADERPROC fnCompileShader = (PFNGLCOMPILESHADERPROC) wglGetProcAddress("glCompileShader");
+	fnCompileShader(vshader);
+	
+	PFNGLGETSHADERIVPROC fnGetShaderiv = (PFNGLGETSHADERIVPROC) wglGetProcAddress("glGetShaderiv");
+	int compileOk = 1;
+	fnGetShaderiv(vshader, GL_COMPILE_STATUS, &compileOk);
+	printf("compileOK: %d\n", compileOk);
+	
+	
+	
 	
 }
 
@@ -218,11 +236,38 @@ LRESULT CALLBACK WinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			   
 			InitGL(glWin);
 			
+			
+			
+			// Shader preparation
+			TCHAR buff[1024];
+			GetWindowText(txtVertexShader, buff, 1024);
+			printf("vshader source: %s\n", buff);
+			
+			const GLchar* vsc[] = 
+			{
+				"#version 430 core						\n"
+				"										\n"
+				"void main()							\n"
+				"{										\n"
+				"	gl_Position = vec4(0.0, 0.0, 0.5, 1.0);	\n"
+				"}										\n"
+				
+			};
+			CompileShaders(vsc, vsc);
+			
 		}
 		break;
 	
     case WM_CLOSE: 
 		printf("in WM_CLOSE\n");
+		
+		// Debug stuff
+		TCHAR buff[1024];
+		GetWindowText(txtVertexShader, buff, 1024);
+		printf("vshader source: %s\n", buff);
+		// end debug stuff
+		
+		
 		DestroyWindow(hwnd); break;
     case WM_PAINT:
 		{
